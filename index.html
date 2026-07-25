@@ -1,65 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Estação Meteorológica Cariri</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-:root{--bg:#07111f;--card:#0e1b2d;--card2:#13243a;--text:#eaf2ff;--muted:#8fa4bd;--accent:#4da3ff;--line:#21354d}
-*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#06101d,#0b1d31);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-.container{max-width:1200px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.brand h1{margin:0;font-size:clamp(24px,4vw,38px)}.brand p{margin:6px 0;color:var(--muted)}
-.live{display:flex;align-items:center;gap:8px;color:#b9f6c5;font-size:14px}.dot{width:10px;height:10px;border-radius:50%;background:#44d36c;box-shadow:0 0 12px #44d36c}
-.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:18px}.card{background:rgba(14,27,45,.9);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.18);overflow:hidden}.sky{position:relative;min-height:380px;background:#1a3048}.sky img{width:100%;height:100%;min-height:380px;object-fit:cover;display:block}.overlay{position:absolute;left:18px;bottom:18px;background:rgba(0,0,0,.55);padding:12px 16px;border-radius:12px}.overlay strong{display:block;font-size:18px}.overlay span{color:#c5d2e2;font-size:13px}
-.metrics{display:grid;grid-template-columns:1fr 1fr;gap:18px}.metric{padding:22px}.metric small{color:var(--muted);display:block;margin-bottom:10px}.metric .value{font-size:34px;font-weight:bold}.metric .sub{color:var(--muted);margin-top:7px;font-size:13px}.icon{font-size:26px;float:right}
-.section{margin-top:18px;padding:20px}.section h2{font-size:18px;margin:0 0 16px}.chartbox{height:310px}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.thumb{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--card2)}.thumb img{width:100%;height:120px;object-fit:cover;display:block}.thumb div{padding:9px;color:var(--muted);font-size:12px}
-.footer{text-align:center;color:var(--muted);font-size:12px;padding:26px 0 10px}
-@media(max-width:800px){.hero{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}.sky,.sky img{min-height:280px}.chartbox{height:260px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Estação Meteorológica Cariri</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{--bg:#07111f;--panel:rgba(17,31,51,.86);--line:rgba(153,191,230,.14);--text:#eef6ff;--muted:#98acc4;--blue:#46b7ff;--green:#60e6b0;--yellow:#ffd166;--violet:#aa8cff}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0,#173b64 0,transparent 33%),radial-gradient(circle at 100% 10%,#172a51 0,transparent 28%),var(--bg)}
+    .page{max-width:1280px;margin:auto;padding:32px 22px 46px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}.brand{display:flex;gap:14px;align-items:center}.brand-icon{font-size:32px;width:56px;height:56px;display:grid;place-items:center;background:linear-gradient(145deg,#1d4d7a,#123151);border:1px solid var(--line);border-radius:17px}.brand h1{font-size:24px;margin:0}.brand p{color:var(--muted);margin:5px 0 0;font-size:14px}.status{font-size:13px;color:#bff4df;background:rgba(53,198,137,.12);border:1px solid rgba(53,198,137,.24);padding:9px 12px;border-radius:999px}
+    .dashboard{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.9fr);gap:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 40px rgba(0,0,0,.2);backdrop-filter:blur(10px)}.sky{overflow:hidden}.sky-photo{min-height:385px;background:linear-gradient(180deg,rgba(12,26,49,.04),rgba(7,17,31,.35)),url('https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=1500&q=85') center/cover;position:relative}.sky-label{position:absolute;bottom:18px;left:20px;padding:10px 13px;background:rgba(4,11,20,.74);border:1px solid rgba(255,255,255,.16);border-radius:12px}.sky-label strong,.sky-label span{display:block}.sky-label span{font-size:12px;color:#c1d0df;margin-top:4px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:14px}.metric{padding:19px;min-height:180px}.metric .emoji{font-size:25px}.metric .name{font-size:13px;color:var(--muted);margin-top:17px}.metric .value{font-weight:700;font-size:28px;margin-top:5px;letter-spacing:-.5px}.metric .source{font-size:12px;color:#aebed1;margin-top:10px}.metric.humidity .value{color:#72d6ff}
+    .charts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}.chart-card{padding:19px;height:294px}.chart-card h2,.gallery h2{margin:0;font-size:15px}.chart-card p{margin:6px 0 14px;color:var(--muted);font-size:12px}.chart-wrap{height:210px}.gallery{margin-top:18px;padding:20px}.gallery p{font-size:13px;color:var(--muted);margin:6px 0 16px}.thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.thumb{aspect-ratio:1.45;border-radius:12px;background-size:cover;background-position:center;border:1px solid var(--line)}.thumb:nth-child(1){background-image:url('https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=500&q=70')}.thumb:nth-child(2){background-image:url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=500&q=70')}.thumb:nth-child(3){background-image:url('https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=500&q=70')}.thumb:nth-child(4){background-image:url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=500&q=70')}.thumb:nth-child(5){background-image:url('https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=500&q=70')}.thumb:nth-child(6){background-image:url('https://images.unsplash.com/photo-1494548162494-384bba4ab999?auto=format&fit=crop&w=500&q=70')}
+    @media(max-width:900px){.dashboard,.charts{grid-template-columns:1fr}.sky-photo{min-height:310px}.thumbs{grid-template-columns:repeat(3,1fr)}}@media(max-width:520px){.page{padding:20px 14px}.header{align-items:flex-start;gap:14px}.status{display:none}.brand h1{font-size:19px}.metrics{gap:10px}.metric{min-height:152px;padding:15px}.metric .value{font-size:23px}.thumbs{gap:8px}}
+  </style>
 </head>
 <body>
-<div class="container">
-  <header class="top">
-    <div class="brand"><h1>Estação Meteorológica Cariri</h1><p>Monitoramento do céu e das condições atmosféricas</p></div>
-    <div class="live"><span class="dot"></span> Sistema online</div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="card sky">
-        <img id="skyImage" src="https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=1400&q=85" alt="Céu atual">
-        <div class="overlay"><strong>Imagem atual do céu</strong><span id="lastUpdate">Atualizada agora</span></div>
-      </div>
-      <div class="metrics">
-        <div class="card metric"><span class="icon">🌡️</span><small>Temperatura</small><div class="value" id="tempNow">29,4 °C</div><div class="sub">BMP180 • agora</div></div>
-        <div class="card metric"><span class="icon">📈</span><small>Pressão</small><div class="value" id="pressNow">1011,8 hPa</div><div class="sub">BMP180 • agora</div></div>
-        <div class="card metric"><span class="icon">☁️</span><small>Última imagem</small><div class="value" id="imageAge">1 min</div><div class="sub">ESP32-CAM</div></div>
-        <div class="card metric"><span class="icon">📡</span><small>Estação</small><div class="value">Online</div><div class="sub">Dados recebidos normalmente</div></div>
-      </div>
+  <main class="page">
+    <header class="header"><div class="brand"><div class="brand-icon">☁️</div><div><h1>Estação Meteorológica Cariri</h1><p>Juazeiro do Norte, Ceará • monitoramento em tempo real</p></div></div><div class="status">● Estação online</div></header>
+    <section class="dashboard">
+      <article class="card sky"><div class="sky-photo"><div class="sky-label"><strong>☁️ Céu atual</strong><span>Imagem simulada • atualizada há 1 minuto</span></div></div></article>
+      <section class="metrics">
+        <article class="card metric"><div class="emoji">🌡️</div><div class="name">Temperatura</div><div class="value" id="temperatureValue">-- °C</div><div class="source" id="temperatureSource">BMP180 • aguardando dados</div></article>
+        <article class="card metric"><div class="emoji">📈</div><div class="name">QNH estimado</div><div class="value" id="pressureValue">-- hPa</div><div class="source" id="pressureSource">BMP180 • corrigido para o nível do mar</div></article>
+        <article class="card metric humidity"><div class="emoji">💧</div><div class="name">Umidade relativa</div><div class="value">68 %</div><div class="source">DHT11 • agora</div></article>
+        <article class="card metric"><div class="emoji">🕒</div><div class="name">Última leitura</div><div class="value" id="lastReading" style="font-size:23px">--:--</div><div class="source" id="connectionStatus">Conectando ao banco...</div></article>
+      </section>
     </section>
-
-    <section class="card section"><h2>🌡️ Temperatura — últimas 24 horas</h2><div class="chartbox"><canvas id="tempChart"></canvas></div></section>
-    <section class="card section"><h2>📈 Pressão atmosférica — últimas 24 horas</h2><div class="chartbox"><canvas id="pressChart"></canvas></div></section>
-
-    <section class="card section"><h2>📷 Histórico recente do céu</h2><div class="gallery" id="gallery"></div></section>
+    <section class="charts">
+      <article class="card chart-card"><h2>🌡️ Temperatura</h2><p>Últimas 24 horas</p><div class="chart-wrap"><canvas id="temperatureChart"></canvas></div></article>
+      <article class="card chart-card"><h2>📈 QNH estimado</h2><p>Últimas 24 horas • corrigido para o nível do mar</p><div class="chart-wrap"><canvas id="pressureChart"></canvas></div></article>
+      <article class="card chart-card"><h2>💧 Umidade relativa</h2><p>Últimas 24 horas • DHT11</p><div class="chart-wrap"><canvas id="humidityChart"></canvas></div></article>
+    </section>
+    <section class="card gallery"><h2>🖼️ Histórico do céu</h2><p>Imagens simuladas da câmera ESP32-CAM</p><div class="thumbs"><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div></div></section>
   </main>
-  <div class="footer">Demonstração da futura estação meteorológica • Dados atualmente simulados</div>
-</div>
-<script>
-const labels=['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'];
-const temp=[24.1,23.5,23.0,23.8,25.6,28.2,30.1,31.0,30.4,28.8,26.7,25.2];
-const press=[1014.2,1014.0,1013.8,1013.5,1013.0,1012.5,1011.9,1011.8,1012.0,1012.4,1012.8,1013.1];
-const common={responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(143,164,189,.12)'},ticks:{color:'#8fa4bd'}},y:{grid:{color:'rgba(143,164,189,.12)'},ticks:{color:'#8fa4bd'}}}};
-new Chart(document.getElementById('tempChart'),{type:'line',data:{labels,datasets:[{data:temp,tension:.35,fill:true,borderWidth:2,pointRadius:2}]},options:common});
-new Chart(document.getElementById('pressChart'),{type:'line',data:{labels,datasets:[{data:press,tension:.35,fill:true,borderWidth:2,pointRadius:2}]},options:common});
-const imgs=[
-'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=600&q=80',
-'https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=600&q=80',
-'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=600&q=80',
-'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=600&q=80'];
-const times=['14:32','14:31','14:30','14:29'];
-document.getElementById('gallery').innerHTML=imgs.map((src,i)=>`<div class="thumb"><img src="${src}" alt="Imagem do céu"><div>Hoje, ${times[i]}</div></div>`).join('');
-function update(){const now=new Date();document.getElementById('lastUpdate').textContent='Atualizada às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
-update();setInterval(update,1000);
-</script>
-</body></html>
+  <script>
+    const FIREBASE_URL = 'https://estacaometeorologica-69270-default-rtdb.firebaseio.com';
+    const labels=['15h','17h','19h','21h','23h','01h','03h','05h','07h','09h','11h','13h'];
+    const text='#9db1c8', grid='rgba(157,177,200,.12)';
+    function chart(id,label,data,color,fill,min,max){return new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:[{label,data,borderColor:color,backgroundColor:fill,fill:true,tension:.38,pointRadius:0,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:text,font:{size:10}},grid:{display:false}},y:{min,max,ticks:{color:text,font:{size:10}},grid:{color:grid}}}}})}
+    const temperatureChart=chart('temperatureChart','Temperatura (°C)',[31,30,29,28,27,26,25,24,24,26,28,29.4],'#ffb45b','rgba(255,180,91,.12)',22,33);
+    const pressureChart=chart('pressureChart','QNH (hPa)',[1011.2,1011.5,1011.8,1012.1,1012.2,1012,1011.7,1011.3,1011.1,1011.4,1011.6,1011.8],'#aa8cff','rgba(170,140,255,.13)',1009,1014);
+    const humidityChart=chart('humidityChart','Umidade relativa (%)',[56,59,63,67,71,75,78,81,79,74,70,68],'#5dd7ff','rgba(93,215,255,.14)',45,90);
+    const fmt=n=>new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(new Date(n < 100000000000 ? n * 1000 : n));
+    async function updateStation(){try{const [currentResponse,historyResponse]=await Promise.all([fetch(`${FIREBASE_URL}/current.json`),fetch(`${FIREBASE_URL}/readings.json?orderBy=%22$key%22&limitToLast=288`)]);const current=await currentResponse.json();const history=await historyResponse.json();if(!current)throw new Error('Sem leituras ainda');document.getElementById('temperatureValue').textContent=`${Number(current.temperature).toFixed(1).replace('.',',')} °C`;document.getElementById('pressureValue').textContent=`${Number(current.qnh).toFixed(1).replace('.',',')} hPa`;document.getElementById('lastReading').textContent=fmt(current.timestamp);document.getElementById('temperatureSource').textContent='BMP180 • agora';document.getElementById('pressureSource').textContent='BMP180 • corrigido para o nível do mar';document.getElementById('connectionStatus').textContent='Dados reais • atualizado';const points=Object.values(history||{}).sort((a,b)=>a.timestamp-b.timestamp);if(points.length){const x=points.map(p=>fmt(p.timestamp));temperatureChart.data.labels=x;temperatureChart.data.datasets[0].data=points.map(p=>p.temperature);pressureChart.data.labels=x;pressureChart.data.datasets[0].data=points.map(p=>p.qnh);temperatureChart.update();pressureChart.update();}}catch(error){document.getElementById('connectionStatus').textContent='Aguardando dados do ESP8266';console.warn(error)}}
+    updateStation();setInterval(updateStation,60000);
+  </script>
+</body>
+</html>
