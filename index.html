@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Estação Meteorológica Cariri</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#07111f;--card:#0e1b2d;--card2:#13243a;--text:#eaf2ff;--muted:#8fa4bd;--accent:#4da3ff;--line:#21354d}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#06101d,#0b1d31);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.container{max-width:1200px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.brand h1{margin:0;font-size:clamp(24px,4vw,38px)}.brand p{margin:6px 0;color:var(--muted)}
+.live{display:flex;align-items:center;gap:8px;color:#b9f6c5;font-size:14px}.dot{width:10px;height:10px;border-radius:50%;background:#44d36c;box-shadow:0 0 12px #44d36c}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:18px}.card{background:rgba(14,27,45,.9);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.18);overflow:hidden}.sky{position:relative;min-height:380px;background:#1a3048}.sky img{width:100%;height:100%;min-height:380px;object-fit:cover;display:block}.overlay{position:absolute;left:18px;bottom:18px;background:rgba(0,0,0,.55);padding:12px 16px;border-radius:12px}.overlay strong{display:block;font-size:18px}.overlay span{color:#c5d2e2;font-size:13px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:18px}.metric{padding:22px}.metric small{color:var(--muted);display:block;margin-bottom:10px}.metric .value{font-size:34px;font-weight:bold}.metric .sub{color:var(--muted);margin-top:7px;font-size:13px}.icon{font-size:26px;float:right}
+.section{margin-top:18px;padding:20px}.section h2{font-size:18px;margin:0 0 16px}.chartbox{height:310px}.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.thumb{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--card2)}.thumb img{width:100%;height:120px;object-fit:cover;display:block}.thumb div{padding:9px;color:var(--muted);font-size:12px}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:26px 0 10px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}.sky,.sky img{min-height:280px}.chartbox{height:260px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="top">
+    <div class="brand"><h1>Estação Meteorológica Cariri</h1><p>Monitoramento do céu e das condições atmosféricas</p></div>
+    <div class="live"><span class="dot"></span> Sistema online</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="card sky">
+        <img id="skyImage" src="https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=1400&q=85" alt="Céu atual">
+        <div class="overlay"><strong>Imagem atual do céu</strong><span id="lastUpdate">Atualizada agora</span></div>
+      </div>
+      <div class="metrics">
+        <div class="card metric"><span class="icon">🌡️</span><small>Temperatura</small><div class="value" id="tempNow">29,4 °C</div><div class="sub">BMP180 • agora</div></div>
+        <div class="card metric"><span class="icon">📈</span><small>Pressão</small><div class="value" id="pressNow">1011,8 hPa</div><div class="sub">BMP180 • agora</div></div>
+        <div class="card metric"><span class="icon">☁️</span><small>Última imagem</small><div class="value" id="imageAge">1 min</div><div class="sub">ESP32-CAM</div></div>
+        <div class="card metric"><span class="icon">📡</span><small>Estação</small><div class="value">Online</div><div class="sub">Dados recebidos normalmente</div></div>
+      </div>
+    </section>
+
+    <section class="card section"><h2>🌡️ Temperatura — últimas 24 horas</h2><div class="chartbox"><canvas id="tempChart"></canvas></div></section>
+    <section class="card section"><h2>📈 Pressão atmosférica — últimas 24 horas</h2><div class="chartbox"><canvas id="pressChart"></canvas></div></section>
+
+    <section class="card section"><h2>📷 Histórico recente do céu</h2><div class="gallery" id="gallery"></div></section>
+  </main>
+  <div class="footer">Demonstração da futura estação meteorológica • Dados atualmente simulados</div>
+</div>
+<script>
+const labels=['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'];
+const temp=[24.1,23.5,23.0,23.8,25.6,28.2,30.1,31.0,30.4,28.8,26.7,25.2];
+const press=[1014.2,1014.0,1013.8,1013.5,1013.0,1012.5,1011.9,1011.8,1012.0,1012.4,1012.8,1013.1];
+const common={responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(143,164,189,.12)'},ticks:{color:'#8fa4bd'}},y:{grid:{color:'rgba(143,164,189,.12)'},ticks:{color:'#8fa4bd'}}}};
+new Chart(document.getElementById('tempChart'),{type:'line',data:{labels,datasets:[{data:temp,tension:.35,fill:true,borderWidth:2,pointRadius:2}]},options:common});
+new Chart(document.getElementById('pressChart'),{type:'line',data:{labels,datasets:[{data:press,tension:.35,fill:true,borderWidth:2,pointRadius:2}]},options:common});
+const imgs=[
+'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=600&q=80',
+'https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=600&q=80',
+'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=600&q=80',
+'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=600&q=80'];
+const times=['14:32','14:31','14:30','14:29'];
+document.getElementById('gallery').innerHTML=imgs.map((src,i)=>`<div class="thumb"><img src="${src}" alt="Imagem do céu"><div>Hoje, ${times[i]}</div></div>`).join('');
+function update(){const now=new Date();document.getElementById('lastUpdate').textContent='Atualizada às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+update();setInterval(update,1000);
+</script>
+</body></html>
