@@ -39,7 +39,7 @@
     const labels=['15h','17h','19h','21h','23h','01h','03h','05h','07h','09h','11h','13h'];
     const text='#9db1c8', grid='rgba(157,177,200,.12)';
     function chart(id,label,data,color,fill,min,max){return new Chart(document.getElementById(id),{type:'line',data:{labels,datasets:[{label,data,borderColor:color,backgroundColor:fill,fill:true,tension:.38,pointRadius:0,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:text,font:{size:10}},grid:{display:false}},y:{min,max,ticks:{color:text,font:{size:10}},grid:{color:grid}}}}})}
-    const temperatureChart=chart('temperatureChart','Temperatura (°C)',[31,30,29,28,27,26,25,24,24,26,28,29.4],'#ffb45b','rgba(255,180,91,.12)',22,33);
+    const temperatureChart=chart('temperatureChart','Temperatura (°C)',[31,30,29,28,27,26,25,24,24,26,28,29.4],'#ffb45b','rgba(255,180,91,.12)',22,39);
     const pressureChart=chart('pressureChart','QNH (hPa)',[1011.2,1011.5,1011.8,1012.1,1012.2,1012,1011.7,1011.3,1011.1,1011.4,1011.6,1011.8],'#aa8cff','rgba(170,140,255,.13)',1009,1014);
     const humidityChart=chart('humidityChart','Umidade relativa (%)',[56,59,63,67,71,75,78,81,79,74,70,68],'#5dd7ff','rgba(93,215,255,.14)',45,90);
     const fmt=n=>new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(new Date(n < 100000000000 ? n * 1000 : n));
