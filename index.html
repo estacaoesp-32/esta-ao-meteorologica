@@ -53,11 +53,10 @@ document.querySelector('.metric.humidity .source').textContent =
 humidityChart.data.labels = x;
 humidityChart.data.datasets[0].data = hums;
 
-const humMin = Math.max(0, Math.min(...hums) - 5);
-const humMax = Math.min(100, Math.max(...hums) + 5);
 
-humidityChart.options.scales.y.min = humMin;
-humidityChart.options.scales.y.max = humMax;const qnhMin=Math.min(...qnhs),qnhMax=Math.max(...qnhs),margem=Math.max(1,(qnhMax-qnhMin)*.3);pressureChart.options.scales.y.min=qnhMin-margem;pressureChart.options.scales.y.max=qnhMax+margem;temperatureChart.update();pressureChart.update(); humidityChart.update();updateTrend(points)}}catch(error){document.getElementById('connectionStatus').textContent='Aguardando dados do ESP8266';console.warn(error)}}
+
+humidityChart.options.scales.y.min = 0;
+humidityChart.options.scales.y.max = 100;const qnhMin=Math.min(...qnhs),qnhMax=Math.max(...qnhs),margem=Math.max(1,(qnhMax-qnhMin)*.3);pressureChart.options.scales.y.min=qnhMin-margem;pressureChart.options.scales.y.max=qnhMax+margem;temperatureChart.update();pressureChart.update(); humidityChart.update();updateTrend(points)}}catch(error){document.getElementById('connectionStatus').textContent='Aguardando dados do ESP8266';console.warn(error)}}
     updateStation();setInterval(updateStation,60000);
   </script>
 </body>
