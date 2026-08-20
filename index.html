@@ -26,7 +26,7 @@
         <article class="card metric"><div class="emoji">🕒</div><div class="name">Última leitura</div><div class="value" id="lastReading" style="font-size:23px">--:--</div><div class="source" id="connectionStatus">Conectando ao banco...</div></article>
       </section>
     </section>
-    <section class="card trend"><div class="trend-icon" id="trendIcon">⏳</div><div><h2 id="trendTitle">Tendência meteorológica em análise</h2><p id="trendText">O painel precisa de 3 horas de leituras de QNH para calcular a tendência.</p></div></section>
+    <section class="card trend"><div class="trend-icon" id="trendIcon">⏳</div><div><h2 id="trendTitle">Tendência meteorológica em análise</h2><p id="trendText">O painel analisa pressão, temperatura e umidade das últimas 3 horas.</p></div></section>
     <section class="charts">
       <article class="card chart-card"><h2>🌡️ Temperatura</h2><p>Últimas 24 horas</p><div class="chart-wrap"><canvas id="temperatureChart"></canvas></div></article>
       <article class="card chart-card"><h2>📈 Pressão Atmosférica</h2><p>Últimas 24 horas • corrigido para o nível do mar</p><div class="chart-wrap"><canvas id="pressureChart"></canvas></div></article>
@@ -43,7 +43,91 @@
     const pressureChart=chart('pressureChart','QNH (hPa)',[1011.2,1011.5,1011.8,1012.1,1012.2,1012,1011.7,1011.3,1011.1,1011.4,1011.6,1011.8],'#aa8cff','rgba(170,140,255,.13)',1009,1014);
     const humidityChart=chart('humidityChart','Umidade relativa (%)',[56,59,63,67,71,75,78,81,79,74,70,68],'#5dd7ff','rgba(93,215,255,.14)',0,90);
     const fmt=n=>new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit'}).format(new Date(n < 100000000000 ? n * 1000 : n));
-    function updateTrend(points){if(points.length<37)return;const recent=points.at(-1),past=points.at(-37),delta=recent.qnh-past.qnh;let icon='➡️',title='Tendência estável',message='O QNH variou pouco nas últimas 3 horas; não há sinal barométrico forte de mudança.';if(delta>=3.6){icon='☀️';title='Pressão subindo rapidamente';message='Tendência de estabilização, com possível aumento de vento. Variação: +'+delta.toFixed(1).replace('.',',')+' hPa em 3 horas.'}else if(delta>=1.6){icon='🌤️';title='Pressão em alta';message='Tendência de condições mais estáveis nas próximas horas. Variação: +'+delta.toFixed(1).replace('.',',')+' hPa em 3 horas.'}else if(delta<=-3.6){icon='⚠️';title='Pressão caindo rapidamente';message='Sinal de instabilidade crescente. Acompanhe as condições locais. Variação: '+delta.toFixed(1).replace('.',',')+' hPa em 3 horas.'}else if(delta<=-1.6){icon='🌥️';title='Pressão em queda';message='Possível mudança para condições mais instáveis nas próximas horas. Variação: '+delta.toFixed(1).replace('.',',')+' hPa em 3 horas.'}document.getElementById('trendIcon').textContent=icon;document.getElementById('trendTitle').textContent=title;document.getElementById('trendText').textContent=message}
+    function updateTrend(points){
+  if(points.length<37)return;
+
+  const recent=points.at(-1);
+  const past=points.at(-37);
+
+  const dp=recent.qnh-past.qnh;
+  const dh=recent.humidity-past.humidity;
+  const dt=recent.temperature-past.temperature;
+
+  // Ponto de orvalho atual: indica quão próximo o ar está da saturação.
+  const a=17.27, b=237.7;
+  const rh=Math.max(1,Math.min(100,Number(recent.humidity)));
+  const gamma=(a*Number(recent.temperature))/(b+Number(recent.temperature))+Math.log(rh/100);
+  const dewPoint=(b*gamma)/(a-gamma);
+  const spread=Number(recent.temperature)-dewPoint;
+
+  // Índice heurístico: 0 = tempo mais estável, 100 = maior sinal de chuva/instabilidade.
+  let score=35;
+
+  // Tendência da pressão em 3 horas.
+  if(dp<=-3.6)score+=28;
+  else if(dp<=-2.0)score+=20;
+  else if(dp<=-1.0)score+=10;
+  else if(dp>=3.6)score-=22;
+  else if(dp>=2.0)score-=16;
+  else if(dp>=1.0)score-=8;
+
+  // Umidade atual e sua tendência.
+  const humidity=Number(recent.humidity);
+  if(humidity>=90)score+=18;
+  else if(humidity>=80)score+=12;
+  else if(humidity>=70)score+=6;
+
+  if(dh>=10)score+=12;
+  else if(dh>=5)score+=7;
+  else if(dh<=-10)score-=10;
+  else if(dh<=-5)score-=6;
+
+  // Resfriamento com aumento de umidade reforça a tendência de instabilidade.
+  if(dt<=-2 && dh>=5)score+=10;
+  else if(dt<=-1 && dh>=3)score+=5;
+
+  // Ar muito próximo do ponto de orvalho.
+  if(spread<=2)score+=12;
+  else if(spread<=4)score+=6;
+
+  score=Math.max(0,Math.min(100,score));
+
+  let icon='➡️';
+  let title='Tempo relativamente estável';
+  let message='Pressão, temperatura e umidade não mostram sinais fortes de mudança.';
+
+  if(score>=82){
+    icon='⛈️';
+    title='Alta possibilidade de chuva';
+    message='Pressão em queda, umidade elevada e/ou aumento de umidade indicam maior instabilidade. ';
+  }else if(score>=65){
+    icon='🌧️';
+    title='Possibilidade de chuva';
+    message='Há sinais de aumento de instabilidade nas próximas horas. ';
+  }else if(score>=48){
+    icon='🌥️';
+    title='Mudança de tempo';
+    message='As variáveis meteorológicas mostram uma tendência de mudança. ';
+  }else if(score>=30){
+    icon='🌤️';
+    title='Tendência de melhora';
+    message='A evolução dos sensores é compatível com condições mais estáveis. ';
+  }else{
+    icon='☀️';
+    title='Tempo estável';
+    message='Pressão favorecendo estabilidade, com umidade sem aumento importante. ';
+  }
+
+  message+=
+    'Pressão: '+(dp>=0?'+':'')+dp.toFixed(1).replace('.',',')+' hPa em 3h; '+
+    'umidade: '+(dh>=0?'+':'')+dh.toFixed(0).replace('.',',')+'%; '+
+    'temperatura: '+(dt>=0?'+':'')+dt.toFixed(1).replace('.',',')+' °C. '+
+    'Índice: '+score.toFixed(0)+'/100.';
+
+  document.getElementById('trendIcon').textContent=icon;
+  document.getElementById('trendTitle').textContent=title;
+  document.getElementById('trendText').textContent=message;
+}
     async function updateStation(){try{const [currentResponse,historyResponse]=await Promise.all([fetch(`${FIREBASE_URL}/current.json`),fetch(`${FIREBASE_URL}/readings.json?orderBy=%22$key%22&limitToLast=288`)]);const current=await currentResponse.json();const history=await historyResponse.json();if(!current)throw new Error('Sem leituras ainda');document.getElementById('temperatureValue').textContent=`${Number(current.temperature).toFixed(1).replace('.',',')} °C`;document.getElementById('pressureValue').textContent=`${Number(current.qnh).toFixed(1).replace('.',',')} hPa`; document.querySelector('.metric.humidity .value').textContent =
 `${Number(current.humidity).toFixed(0)} %`;
 
